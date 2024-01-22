@@ -1,0 +1,33 @@
+app: challenge-app
+service: challenge-app
+frameworkVersion: '3'
+provider:
+  name: aws
+  runtime: nodejs20.x
+  timeout: 900
+
+functions:
+  getReviews:
+    handler: src/getReviews.handler
+    events:
+      - httpApi:
+          path: /reviews
+          method: get
+  getCompanyReviews:
+    handler: src/getCompanyReviews.handler
+    events:
+      - httpApi:
+          path: /reviews/:companyId
+          method: get
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-typescript
+  - serverless-dotenv-plugin
+
+package:
+  patterns:
+    - '!node_modules/.prisma/client/libquery_engine-*'
+    - 'node_modules/.prisma/client/libquery_engine-rhel-*'
+    - '!node_modules/prisma/libquery_engine-*'
+    - '!node_modules/@prisma/engines/**'
