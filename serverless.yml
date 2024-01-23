@@ -24,12 +24,6 @@ functions:
           path: /all
           method: get
           timeout: 30
-  getReviewById:
-    handler: src/getReviewById.handler
-    events:
-      - httpApi:
-          path: /reviews/{reviewId}
-          method: get
   getReviewerById:
     handler: src/getReviewerById.handler
     events:
