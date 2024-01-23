@@ -124,19 +124,20 @@ export const handler = async (
     for await (const search of companiesOptionsSearch) {
       const getReviewsBody = {
         deeperCityScrape: false,
-        includeWebResults: false,
+        includeWebResults: true,
+        language: "pt-BR",
         maxCrawledPlacesPerSearch: 1,
         maxImages: 0,
         reviewsSort: "newest",
         maxReviews: search.searchReviewCount,
         onlyDataFromSearchPage: false,
         scrapeDirectories: false,
-        scrapeResponseFromOwnerText: false,
-        scrapeReviewId: false,
-        scrapeReviewUrl: false,
-        scrapeReviewerId: false,
+        scrapeResponseFromOwnerText: true,
+        scrapeReviewId: true,
+        scrapeReviewUrl: true,
+        scrapeReviewerId: true,
         scrapeReviewerName: true,
-        scrapeReviewerUrl: false,
+        scrapeReviewerUrl: true,
         skipClosedPlaces: false,
         startUrls: [
           {
@@ -195,7 +196,7 @@ export const handler = async (
         if (!review.reviewId) {
           reviewExists = await prismaDb.review.findFirst({
             where: {
-              content: review.text,
+              content: review.textTranslated ?? review.text,
               stars: review.stars,
               likesCount: review.likesCount,
               reviewUrl: review.reviewUrl,
@@ -271,15 +272,16 @@ export const handler = async (
         }
       }
     }
+
+    await prismaDb.$disconnect();
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: "Reviews scraped successfully" }),
+    };
   } catch (error) {
     return {
       statusCode: 500,
       body: JSON.stringify({ message: "Error to scrape reviews", error }),
     };
   }
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ message: "Reviews scraped successfully" }),
-  };
 };

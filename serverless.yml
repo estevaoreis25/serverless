@@ -4,26 +4,18 @@ frameworkVersion: '3'
 provider:
   name: aws
   runtime: nodejs20.x
-  timeout: 900
 
 functions:
   getReviews:
     handler: src/getReviews.handler
+    timeout: 900
     events:
-      - httpApi:
-          path: /reviews
-          method: get
+      - schedule: rate(10 minutes)
   getCompanyReviews:
     handler: src/getCompanyReviews.handler
     events:
       - httpApi:
           path: /reviews/{companyId}
-          method: get
-  getCompanyReviewers:
-    handler: src/getCompanyReviewers.handler
-    events:
-      - httpApi:
-          path: /reviewers/{companyId}
           method: get
 
 plugins:

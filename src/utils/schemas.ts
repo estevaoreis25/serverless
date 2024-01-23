@@ -44,6 +44,7 @@ export const scrapeSchema = z.array(
       z.object({
         name: z.string(),
         text: z.string().nullish(),
+        textTranslated: z.string().nullish(),
         publishAt: z.string(),
         publishedAtDate: z.string(),
         likesCount: z.number(),
