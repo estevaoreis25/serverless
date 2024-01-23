@@ -16,6 +16,8 @@ model Reviewer {
   reviews            Review[]
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+
+  @@index([externalReviewerId])
 }
 
 model Company {
@@ -27,29 +29,48 @@ model Company {
   phone         String?
   totalScore    Float    @default(0.0)
   googleMapsUrl String?
-  oneStars      Int?
-  twoStars      Int?
-  threeStars    Int?
-  fourStars     Int?
-  fiveStars     Int?
+  oneStars      Int      @default(0)
+  twoStars      Int      @default(0)
+  threeStars    Int      @default(0)
+  fourStars     Int      @default(0)
+  fiveStars     Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   reviews       Review[]
+
+  @@index([placeId])
+  @@index([name])
+  @@index([postalCode])
+  @@index([totalScore])
+  @@index([oneStars])
+  @@index([twoStars])
+  @@index([threeStars])
+  @@index([fourStars])
+  @@index([fiveStars])
 }
 
 model Review {
-  id                   Int       @id @default(autoincrement())
-  externalReviewId     String?   @unique
+  id                   Int     @id @default(autoincrement())
+  externalReviewId     String? @unique
   reviewUrl            String?
-  stars                Int
+  stars                Int     @default(1)
   content              String?
   responseOwnerContent String?
-  likesCount           Int       @default(0)
-  reviewer             Reviewer? @relation(fields: [reviewerId], references: [id])
-  reviewerId           Int?
-  company              Company?  @relation(fields: [companyId], references: [id])
-  companyId            Int?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-  publishedAt          DateTime
+  likesCount           Int     @default(0)
+
+  reviewer   Reviewer? @relation(fields: [reviewerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  reviewerId Int?
+
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  companyId Int?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime
+
+  @@index([reviewerId])
+  @@index([companyId])
+  @@index([publishedAt])
+  @@index([stars])
+  @@index([reviewUrl])
 }
