@@ -1,16 +1,11 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { prismaDb } from "./database";
-import { ApifyClient } from "apify-client";
-import { minimalScrapeSchema, scrapeSchema } from "./utils/schemas";
 
-export const handler = async (
+const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  const client = new ApifyClient({
-    token: process.env.APIFY_ACCESS_TOKEN,
-  });
-
   const companyId = event.pathParameters?.companyId;
+  console.log("companyId", companyId);
 
   if (!companyId)
     return {
@@ -29,14 +24,17 @@ export const handler = async (
         },
         orderBy: {
           publishedAt: "desc",
-          stars: "asc",
         },
       },
     },
   });
 
+  prismaDb.$disconnect();
+
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: "Reviews scraped successfully" }),
+    body: JSON.stringify(company),
   };
 };
+
+export default handler;

@@ -17,7 +17,13 @@ functions:
     handler: src/getCompanyReviews.handler
     events:
       - httpApi:
-          path: /reviews/:companyId
+          path: /reviews/{companyId}
+          method: get
+  getCompanyReviewers:
+    handler: src/getCompanyReviewers.handler
+    events:
+      - httpApi:
+          path: /reviewers/{companyId}
           method: get
 
 plugins:

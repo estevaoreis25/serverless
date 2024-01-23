@@ -7,11 +7,14 @@
     "provider": {
       "name": "aws",
       "runtime": "nodejs20.x",
+      "timeout": 900,
       "stage": "dev",
       "region": "us-east-1",
       "versionFunctions": true,
       "environment": {
-        "DATABASE_URL": "postgresql://postgres:arccadb123@db-arcca.crkegk0y8o5c.us-east-2.rds.amazonaws.com:5432/postgres"
+        "DATABASE_URL": "postgresql://postgres:arccadb123@db-arcca.crkegk0y8o5c.us-east-2.rds.amazonaws.com:5432/postgres",
+        "APIFY_ACCESS_TOKEN": "apify_api_4zTjIBwkSndnh6l5qzYz8rVe9awjJF0Zeyhj",
+        "PRISMA_CLI_BINARY_TARGETS": "native,rhel-openssl-1.0.x"
       },
       "compiledCloudFormationTemplate": {
         "AWSTemplateFormatVersion": "2010-09-09",
@@ -90,6 +93,18 @@
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
               "LogGroupName": "/aws/lambda/challenge-app-dev-getReviews"
+            }
+          },
+          "GetCompanyReviewsLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/challenge-app-dev-getCompanyReviews"
+            }
+          },
+          "GetCompanyReviewersLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/challenge-app-dev-getCompanyReviewers"
             }
           },
           "IamRoleLambdaExecution": {
@@ -177,16 +192,18 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/challenge-app/dev/1705884484140-2024-01-22T00:48:04.140Z/challenge-app.zip"
+                "S3Key": "serverless/challenge-app/dev/1705962871545-2024-01-22T22:34:31.545Z/challenge-app.zip"
               },
               "Handler": "src/getReviews.handler",
               "Runtime": "nodejs20.x",
               "FunctionName": "challenge-app-dev-getReviews",
               "MemorySize": 1024,
-              "Timeout": 6,
+              "Timeout": 900,
               "Environment": {
                 "Variables": {
-                  "DATABASE_URL": "postgresql://postgres:arccadb123@db-arcca.crkegk0y8o5c.us-east-2.rds.amazonaws.com:5432/postgres"
+                  "DATABASE_URL": "postgresql://postgres:arccadb123@db-arcca.crkegk0y8o5c.us-east-2.rds.amazonaws.com:5432/postgres",
+                  "APIFY_ACCESS_TOKEN": "apify_api_4zTjIBwkSndnh6l5qzYz8rVe9awjJF0Zeyhj",
+                  "PRISMA_CLI_BINARY_TARGETS": "native,rhel-openssl-1.0.x"
                 }
               },
               "Role": {
@@ -200,14 +217,98 @@
               "GetReviewsLogGroup"
             ]
           },
-          "GetReviewsLambdaVersionR1w1YIM2jZfZm600ynkLzWW0W3Qm1OYKOVttShq9T4": {
+          "GetCompanyReviewsLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/challenge-app/dev/1705962871545-2024-01-22T22:34:31.545Z/challenge-app.zip"
+              },
+              "Handler": "src/getCompanyReviews.handler",
+              "Runtime": "nodejs20.x",
+              "FunctionName": "challenge-app-dev-getCompanyReviews",
+              "MemorySize": 1024,
+              "Timeout": 900,
+              "Environment": {
+                "Variables": {
+                  "DATABASE_URL": "postgresql://postgres:arccadb123@db-arcca.crkegk0y8o5c.us-east-2.rds.amazonaws.com:5432/postgres",
+                  "APIFY_ACCESS_TOKEN": "apify_api_4zTjIBwkSndnh6l5qzYz8rVe9awjJF0Zeyhj",
+                  "PRISMA_CLI_BINARY_TARGETS": "native,rhel-openssl-1.0.x"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "GetCompanyReviewsLogGroup"
+            ]
+          },
+          "GetCompanyReviewersLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/challenge-app/dev/1705962871545-2024-01-22T22:34:31.545Z/challenge-app.zip"
+              },
+              "Handler": "src/getCompanyReviewers.handler",
+              "Runtime": "nodejs20.x",
+              "FunctionName": "challenge-app-dev-getCompanyReviewers",
+              "MemorySize": 1024,
+              "Timeout": 900,
+              "Environment": {
+                "Variables": {
+                  "DATABASE_URL": "postgresql://postgres:arccadb123@db-arcca.crkegk0y8o5c.us-east-2.rds.amazonaws.com:5432/postgres",
+                  "APIFY_ACCESS_TOKEN": "apify_api_4zTjIBwkSndnh6l5qzYz8rVe9awjJF0Zeyhj",
+                  "PRISMA_CLI_BINARY_TARGETS": "native,rhel-openssl-1.0.x"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "GetCompanyReviewersLogGroup"
+            ]
+          },
+          "GetReviewsLambdaVersion8jmXIMsN0rNqzixlswFCVAbCFV1RsH2DPMcO7jQ6GM": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "GetReviewsLambdaFunction"
               },
-              "CodeSha256": "6U4b0CHklcRZe5yMfAXZjO1fx894IBe0QyDe0wf81Dc="
+              "CodeSha256": "23v3nntc2q8BcJDz40kzRjvHDl9GPS2Ckr0aGYF82uU="
+            }
+          },
+          "GetCompanyReviewsLambdaVersionOTrGzCDkjscFHmCQbGCWuX8vD5mKZsdRZCbgjc6Oc": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "GetCompanyReviewsLambdaFunction"
+              },
+              "CodeSha256": "23v3nntc2q8BcJDz40kzRjvHDl9GPS2Ckr0aGYF82uU="
+            }
+          },
+          "GetCompanyReviewersLambdaVersionLQO8jv4nqzdpSIZRHfLR5eMfpiUNdSnE6GzBDslAg": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "GetCompanyReviewersLambdaFunction"
+              },
+              "CodeSha256": "23v3nntc2q8BcJDz40kzRjvHDl9GPS2Ckr0aGYF82uU="
             }
           },
           "HttpApi": {
@@ -301,6 +402,150 @@
               }
             },
             "DependsOn": "HttpApiIntegrationGetReviews"
+          },
+          "GetCompanyReviewsLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "GetCompanyReviewsLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationGetCompanyReviews": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"GetCompanyReviewsLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRouteGetReviewsCompanyidVar": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "GET /reviews/{companyId}",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationGetCompanyReviews"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationGetCompanyReviews"
+          },
+          "GetCompanyReviewersLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "GetCompanyReviewersLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationGetCompanyReviewers": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"GetCompanyReviewersLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRouteGetReviewersCompanyidVar": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "GET /reviewers/{companyId}",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationGetCompanyReviewers"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationGetCompanyReviewers"
           }
         },
         "Outputs": {
@@ -315,10 +560,28 @@
           "GetReviewsLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "GetReviewsLambdaVersionR1w1YIM2jZfZm600ynkLzWW0W3Qm1OYKOVttShq9T4"
+              "Ref": "GetReviewsLambdaVersion8jmXIMsN0rNqzixlswFCVAbCFV1RsH2DPMcO7jQ6GM"
             },
             "Export": {
               "Name": "sls-challenge-app-dev-GetReviewsLambdaFunctionQualifiedArn"
+            }
+          },
+          "GetCompanyReviewsLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "GetCompanyReviewsLambdaVersionOTrGzCDkjscFHmCQbGCWuX8vD5mKZsdRZCbgjc6Oc"
+            },
+            "Export": {
+              "Name": "sls-challenge-app-dev-GetCompanyReviewsLambdaFunctionQualifiedArn"
+            }
+          },
+          "GetCompanyReviewersLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "GetCompanyReviewersLambdaVersionLQO8jv4nqzdpSIZRHfLR5eMfpiUNdSnE6GzBDslAg"
+            },
+            "Export": {
+              "Name": "sls-challenge-app-dev-GetCompanyReviewersLambdaFunctionQualifiedArn"
             }
           },
           "HttpApiId": {
@@ -469,10 +732,62 @@
           "patterns": []
         },
         "memory": 1024,
-        "timeout": 6,
+        "timeout": 900,
         "runtime": "nodejs20.x",
         "vpc": {},
-        "versionLogicalId": "GetReviewsLambdaVersionR1w1YIM2jZfZm600ynkLzWW0W3Qm1OYKOVttShq9T4"
+        "versionLogicalId": "GetReviewsLambdaVersion8jmXIMsN0rNqzixlswFCVAbCFV1RsH2DPMcO7jQ6GM"
+      },
+      "getCompanyReviews": {
+        "handler": "src/getCompanyReviews.handler",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/reviews/{companyId}",
+              "method": "get"
+            },
+            "resolvedMethod": "GET",
+            "resolvedPath": "/reviews/{companyId}"
+          }
+        ],
+        "name": "challenge-app-dev-getCompanyReviews",
+        "package": {
+          "exclude": [
+            "node_modules/serverless-plugin-typescript"
+          ],
+          "include": [],
+          "patterns": []
+        },
+        "memory": 1024,
+        "timeout": 900,
+        "runtime": "nodejs20.x",
+        "vpc": {},
+        "versionLogicalId": "GetCompanyReviewsLambdaVersionOTrGzCDkjscFHmCQbGCWuX8vD5mKZsdRZCbgjc6Oc"
+      },
+      "getCompanyReviewers": {
+        "handler": "src/getCompanyReviewers.handler",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/reviewers/{companyId}",
+              "method": "get"
+            },
+            "resolvedMethod": "GET",
+            "resolvedPath": "/reviewers/{companyId}"
+          }
+        ],
+        "name": "challenge-app-dev-getCompanyReviewers",
+        "package": {
+          "exclude": [
+            "node_modules/serverless-plugin-typescript"
+          ],
+          "include": [],
+          "patterns": []
+        },
+        "memory": 1024,
+        "timeout": 900,
+        "runtime": "nodejs20.x",
+        "vpc": {},
+        "versionLogicalId": "GetCompanyReviewersLambdaVersionLQO8jv4nqzdpSIZRHfLR5eMfpiUNdSnE6GzBDslAg"
       }
     },
     "configValidationMode": "warn",
@@ -499,7 +814,7 @@
         ],
         "artifactsS3KeyDirname": "serverless/challenge-app/dev/code-artifacts",
         "artifact": "/home/estevao/Documentos/Desafio/challenge/.serverless/challenge-app.zip",
-        "artifactDirectoryName": "serverless/challenge-app/dev/1705884484140-2024-01-22T00:48:04.140Z"
+        "artifactDirectoryName": "serverless/challenge-app/dev/1705962871545-2024-01-22T22:34:31.545Z"
       }
     },
     "app": "challenge-app",
@@ -508,7 +823,7 @@
     "artifact": "/home/estevao/Documentos/Desafio/challenge/.build/.serverless/challenge-app.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/challenge-app/dev/1705884484140-2024-01-22T00:48:04.140Z",
+    "artifactDirectoryName": "serverless/challenge-app/dev/1705962871545-2024-01-22T22:34:31.545Z",
     "artifact": "challenge-app.zip"
   }
 }

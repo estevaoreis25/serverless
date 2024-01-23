@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { prismaDb } from "./database";
 import { ApifyClient } from "apify-client";
 import { minimalScrapeSchema, scrapeSchema } from "./utils/schemas";
-import { z, infer } from "zod";
+import { z } from "zod";
 import { Review } from "@prisma/client";
 
 export const handler = async (
