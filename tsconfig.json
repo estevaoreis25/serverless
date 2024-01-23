@@ -3,9 +3,6 @@
     "lib": ["es2016", "esnext.asynciterable"],
     "baseUrl": "./src",
     "outDir": "./build",
-    "paths": {
-      "@libs/*": ["libs/*"]
-    },
     "target": "ESNext",
     "module": "commonjs",
     "sourceMap": true,

@@ -1,3 +1,29 @@
+# Ignorar a pasta node_modules
 node_modules
-# Keep environment variables out of version control
+
+# Ignorar arquivos de ambiente
 .env
+
+# Ignorar a pasta de build
+.build/
+
+# Ignorar a pasta .serverless
+.serverless/
+
+# Ignorar a pasta de migrações do Prisma
+prisma/migrations/
+
+# Ignorar arquivos de log
+*.log
+
+# Ignorar arquivos de cache
+*.cache
+
+# Ignorar arquivos de configuração do editor
+.vscode/
+*.iml
+.idea/
+
+# Ignorar arquivos de sistema
+.DS_Store
+Thumbs.db

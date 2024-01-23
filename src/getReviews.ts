@@ -1,101 +1,42 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { prismaDb } from "./database";
-import { ApifyClient } from "apify-client";
-import { minimalScrapeSchema, scrapeSchema } from "./utils/schemas";
+import { APIGatewayProxyResult } from "aws-lambda";
+import { prismaDb } from "./db/database";
+import { scrapeSchema } from "./utils/schemas";
 import { z } from "zod";
-import { Review } from "@prisma/client";
+import { apifyFunctions } from "./providers/api";
+import { companyPrismaQuery } from "./db/company";
+import { reviewPrismaQuery } from "./db/review";
 
-export const handler = async (
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> => {
-  const client = new ApifyClient({
-    token: process.env.APIFY_ACCESS_TOKEN,
-  });
-
+export const handler = async (): Promise<APIGatewayProxyResult> => {
   try {
-    const companies = [
-      {
-        url: "https://maps.app.goo.gl/eW4pSUbBSoqShZMM9",
-        title: "Nema - Visconde de Pirajá | Padaria de Fermentação Natural",
-      },
-      {
-        url: "https://maps.app.goo.gl/ygVaxUJHR6zZcWqS9",
-        title: "Nema - Botafogo | Padaria de Fermentação Natural",
-      },
-      {
-        url: "https://maps.app.goo.gl/KUbFispshk2vE55E7",
-        title: "Nema Padaria - Leblon | Padaria de Fermentação Natural",
-      },
-    ];
-
-    const getCountReviewsBody = {
-      deeperCityScrape: false,
-      includeWebResults: false,
-      language: "pt-BR",
-      maxCrawledPlacesPerSearch: 1,
-      maxImages: 0,
-      maxReviews: 0,
-      onlyDataFromSearchPage: true,
-      scrapeDirectories: false,
-      scrapeResponseFromOwnerText: false,
-      scrapeReviewId: false,
-      scrapeReviewUrl: false,
-      scrapeReviewerId: false,
-      scrapeReviewerName: false,
-      scrapeReviewerUrl: false,
-      skipClosedPlaces: false,
-      startUrls: [
-        ...companies.map((company) => ({
-          url: company.url,
-        })),
-      ],
-    };
-
-    const run = await client
-      .actor("nwua9Gu5YrADL7ZDj")
-      .call(getCountReviewsBody);
-
     let companiesOptionsSearch: Array<{
       url: string;
       searchReviewCount: number;
     }> = [];
-    const { items } = await client.dataset(run.defaultDatasetId).listItems();
 
-    const validItems = minimalScrapeSchema.safeParse(items);
+    const { data: companiesInformation, error } =
+      await apifyFunctions.getCountReviewsBody();
 
-    if (!validItems.success) {
+    if (!companiesInformation) {
       return {
         statusCode: 500,
         body: JSON.stringify({
-          message: "Error to parse items",
-          error: validItems.error,
+          message: `Error to scrape companies information`,
+          error: `Error: ${error?.errors}`,
         }),
       };
     }
-
-    for await (const item of validItems.data) {
-      const company = await prismaDb.company.findUnique({
-        where: {
-          placeId: item.placeId,
-        },
-        include: {
-          reviews: {
-            orderBy: {
-              publishedAt: "desc",
-            },
-          },
-        },
-      });
+    for await (const item of companiesInformation) {
+      const company = await companyPrismaQuery.findCompanyByPlaceId(
+        item.placeId
+      );
       if (!company) {
-        await prismaDb.company.create({
-          data: {
-            placeId: item.placeId,
-            name: item.title,
-            address: item.address,
-            googleMapsUrl: item.url,
-            phone: item.phone,
-            postalCode: item.postalCode,
-          },
+        await companyPrismaQuery.createCompany({
+          placeId: item.placeId,
+          name: item.title,
+          address: item.address,
+          googleMapsUrl: item.url,
+          phone: item.phone,
+          postalCode: item.postalCode,
         });
         companiesOptionsSearch.push({
           url: item.url,
@@ -122,66 +63,33 @@ export const handler = async (
 
     let companiesReviews: z.infer<typeof scrapeSchema> = [];
     for await (const search of companiesOptionsSearch) {
-      const getReviewsBody = {
-        deeperCityScrape: false,
-        includeWebResults: true,
-        language: "pt-BR",
-        maxCrawledPlacesPerSearch: 1,
-        maxImages: 0,
-        reviewsSort: "newest",
-        maxReviews: search.searchReviewCount,
-        onlyDataFromSearchPage: false,
-        scrapeDirectories: false,
-        scrapeResponseFromOwnerText: true,
-        scrapeReviewId: true,
-        scrapeReviewUrl: true,
-        scrapeReviewerId: true,
-        scrapeReviewerName: true,
-        scrapeReviewerUrl: true,
-        skipClosedPlaces: false,
-        startUrls: [
-          {
-            url: search.url,
-          },
-        ],
-      };
+      const { data: review, error } = await apifyFunctions.getReviews({
+        searchReviewCount: search.searchReviewCount,
+        companyUrl: search.url,
+      });
 
-      const reviewsRun = await client
-        .actor("nwua9Gu5YrADL7ZDj")
-        .call(getReviewsBody);
-
-      const reviews = await client
-        .dataset(reviewsRun.defaultDatasetId)
-        .listItems();
-
-      const validReviews = scrapeSchema.safeParse(reviews.items);
-
-      if (!validReviews.success) {
+      if (!review) {
         return {
           statusCode: 500,
           body: JSON.stringify({
             message: "Error to parse reviews",
-            error: validReviews.error,
+            error: `Error: ${error?.errors}`,
           }),
         };
       }
 
-      companiesReviews.push(validReviews.data[0]);
+      companiesReviews.push(review[0]);
     }
 
     for await (const companyReview of companiesReviews) {
-      await prismaDb.company.update({
-        where: {
-          placeId: companyReview.placeId,
-        },
-        data: {
-          fiveStars: companyReview.reviewsDistribution.fiveStar,
-          fourStars: companyReview.reviewsDistribution.fourStar,
-          threeStars: companyReview.reviewsDistribution.threeStar,
-          twoStars: companyReview.reviewsDistribution.twoStar,
-          oneStars: companyReview.reviewsDistribution.oneStar,
-          totalScore: companyReview.totalScore,
-        },
+      await companyPrismaQuery.updateCompany({
+        placeId: companyReview.placeId,
+        fiveStars: companyReview.reviewsDistribution.fiveStar,
+        fourStars: companyReview.reviewsDistribution.fourStar,
+        threeStars: companyReview.reviewsDistribution.threeStar,
+        twoStars: companyReview.reviewsDistribution.twoStar,
+        oneStars: companyReview.reviewsDistribution.oneStar,
+        totalScore: companyReview.totalScore,
       });
 
       console.log("Quantidade de reviews", companyReview.reviews.length);
@@ -192,27 +100,17 @@ export const handler = async (
 
       for await (const review of orderedReviews) {
         console.log("review", review.text);
-        let reviewExists: Review | null = null;
-        if (!review.reviewId) {
-          reviewExists = await prismaDb.review.findFirst({
-            where: {
-              content: review.textTranslated ?? review.text,
-              stars: review.stars,
-              likesCount: review.likesCount,
-              reviewUrl: review.reviewUrl,
-              publishedAt: review.publishedAtDate,
-              company: {
-                placeId: companyReview.placeId,
-              },
-            },
-          });
-        } else {
-          reviewExists = await prismaDb.review.findUnique({
-            where: {
-              externalReviewId: review.reviewId,
-            },
-          });
-        }
+        let reviewExists = await reviewPrismaQuery.findReview({
+          placeId: companyReview.placeId,
+          text: review.text,
+          textTranslated: review.textTranslated,
+          stars: review.stars,
+          likesCount: review.likesCount,
+          reviewUrl: review.reviewUrl,
+          publishedAtDate: review.publishedAtDate,
+          reviewId: review.reviewId,
+        });
+
         if (reviewExists) {
           console.count("A avaliacao existe");
           await prismaDb.review.update({

@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { prismaDb } from "./database";
+import { prismaDb } from "./db/database";
 
 export const handler = async (
   event: APIGatewayProxyEvent

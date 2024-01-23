@@ -38,7 +38,6 @@ export const scrapeSchema = z.array(
     imagesCount: z.number(),
     imageCategories: z.array(z.string()),
     scrapedAt: z.string(),
-    reserveTableUrl: z.null(),
     googleFoodUrl: z.string(),
     reviews: z.array(
       z.object({
@@ -56,7 +55,6 @@ export const scrapeSchema = z.array(
         reviewerNumberOfReviews: z.number().nullish(),
         isLocalGuide: z.boolean(),
         stars: z.number(),
-        rating: z.null(),
         responseFromOwnerDate: z.string().nullish(),
         responseFromOwnerText: z.string().nullish(),
         reviewImageUrls: z.array(z.unknown()),
@@ -75,8 +73,6 @@ export const minimalScrapeSchema = z.array(
     searchPageLoadedUrl: z.string().nullish(),
     isAdvertisement: z.boolean().nullish(),
     title: z.string(),
-    description: z.null(),
-    price: z.null(),
     categoryName: z.string(),
     address: z.string(),
     neighborhood: z.string(),
