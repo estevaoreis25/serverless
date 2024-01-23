@@ -168,7 +168,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/challenge-app/dev/1706017424125-2024-01-23T13:43:44.125Z/challenge-app.zip"
+          "S3Key": "serverless/challenge-app/dev/1706025556103-2024-01-23T15:59:16.103Z/challenge-app.zip"
         },
         "Handler": "src/getReviews.handler",
         "Runtime": "nodejs20.x",
@@ -199,7 +199,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/challenge-app/dev/1706017424125-2024-01-23T13:43:44.125Z/challenge-app.zip"
+          "S3Key": "serverless/challenge-app/dev/1706025556103-2024-01-23T15:59:16.103Z/challenge-app.zip"
         },
         "Handler": "src/getCompanyReviews.handler",
         "Runtime": "nodejs20.x",
@@ -223,24 +223,24 @@
         "GetCompanyReviewsLogGroup"
       ]
     },
-    "GetReviewsLambdaVersionbaI8XGfXdpjMYYPOWSXkvnlT8l05i716y4A9omFfUP4": {
+    "GetReviewsLambdaVersionCejMlol7fyYrhTaWozcaoqUL42GUhUftT9GtZ8U": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "GetReviewsLambdaFunction"
         },
-        "CodeSha256": "5QxMkv5CkE+50BZERO4bDh/uOuXR8VhJHC0a+N6Nq1w="
+        "CodeSha256": "EywB9t95gJd3tdkVTSysK8npXdW6FHsVjIAKY15I7ow="
       }
     },
-    "GetCompanyReviewsLambdaVersionAoxNfXyZY6b4YsEvTmzpSqOAt0UKRztOccSFQg41I": {
+    "GetCompanyReviewsLambdaVersionmRaKEqx4NAZny9qOLhq0BaJLjQkhnE7czhuP8vtSkY": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "GetCompanyReviewsLambdaFunction"
         },
-        "CodeSha256": "5QxMkv5CkE+50BZERO4bDh/uOuXR8VhJHC0a+N6Nq1w="
+        "CodeSha256": "EywB9t95gJd3tdkVTSysK8npXdW6FHsVjIAKY15I7ow="
       }
     },
     "GetReviewsEventsRuleSchedule1": {
@@ -388,7 +388,7 @@
     "GetReviewsLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "GetReviewsLambdaVersionbaI8XGfXdpjMYYPOWSXkvnlT8l05i716y4A9omFfUP4"
+        "Ref": "GetReviewsLambdaVersionCejMlol7fyYrhTaWozcaoqUL42GUhUftT9GtZ8U"
       },
       "Export": {
         "Name": "sls-challenge-app-dev-GetReviewsLambdaFunctionQualifiedArn"
@@ -397,7 +397,7 @@
     "GetCompanyReviewsLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "GetCompanyReviewsLambdaVersionAoxNfXyZY6b4YsEvTmzpSqOAt0UKRztOccSFQg41I"
+        "Ref": "GetCompanyReviewsLambdaVersionmRaKEqx4NAZny9qOLhq0BaJLjQkhnE7czhuP8vtSkY"
       },
       "Export": {
         "Name": "sls-challenge-app-dev-GetCompanyReviewsLambdaFunctionQualifiedArn"
