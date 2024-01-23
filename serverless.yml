@@ -15,7 +15,26 @@ functions:
     handler: src/getCompanyReviews.handler
     events:
       - httpApi:
-          path: /reviews/{companyId}
+          path: /reviews/company/{companyId}
+          method: get
+  getAll:
+    handler: src/getAll.handler
+    events:
+      - httpApi:
+          path: /all
+          method: get
+          timeout: 30
+  getReviewById:
+    handler: src/getReviewById.handler
+    events:
+      - httpApi:
+          path: /reviews/{reviewId}
+          method: get
+  getReviewerById:
+    handler: src/getReviewerById.handler
+    events:
+      - httpApi:
+          path: /reviewers/{reviewerId}
           method: get
 
 plugins:
